@@ -2,13 +2,17 @@
   "version": 2,
   "routes": [
     {
-      "src": "/api/hello",
-      "dest": "/api/hello.js"
+      "src": "/api/jokes",
+      "dest": "/api/jokes.ts"
+    },
+    {
+      "src": "/api/countries",
+      "dest": "/api/countries.ts"
     }
   ],
   "builds": [
     {
-      "src": "api/**/*.js",
+      "src": "api/**/*.ts",
       "use": "@vercel/node"
     },
     {

@@ -1,20 +1,17 @@
+// lib import
 import express, { Router, json } from 'express'
-
-import Joke from '../lib/models/joke.model'
+const requestCountry = require('request-country')
 
 const app = express()
 app.use(json())
 
 const apiRouter = Router()
 
-apiRouter.get('/hello', async (_req, res) => {
-  const date = new Date().toISOString()
-  const all = await Joke.find({})
-
+apiRouter.get('/code', (req, res) => {
+  const country = requestCountry(req, 'ES') // or requestCountry('2.2.2.2')
   res.json({
-    date,
-    msg: 'Hello men!',
-    data: all,
+    country,
+    lang: country,
   })
 })
 
@@ -23,6 +20,6 @@ apiRouter.use('/**', (_req, res) => {
   res.status(404).json({ status: 404, error: 'Not founded route' })
 })
 
-app.use('/api', apiRouter)
+app.use('/api/countries', apiRouter)
 
 module.exports = app

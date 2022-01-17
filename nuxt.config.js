@@ -59,8 +59,12 @@ export default {
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},
 
+  include: ['./types'],
+
   // publicRuntimeConfig (client, rw) ,privateRuntimeConfig (server (2 are merged, r) better than using env:
   // use like import config from '#config' or this.$config
   serverMiddleware:
-    process.env.NODE_ENV === 'production' ? [] : ['~/api/hello.js'],
+    process.env.NODE_ENV === 'production'
+      ? []
+      : ['~/api/jokes.ts', '~/api/countries.ts'],
 }
