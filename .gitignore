@@ -88,3 +88,7 @@ sw.*
 
 # Vim swap files
 *.swp
+
+# Mine
+db-content/**.json
+!db-content/data.json

@@ -35,7 +35,7 @@ export default {
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
-  modules: [],
+  modules: ['~/modules/mongo.js'],
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
@@ -59,6 +59,13 @@ export default {
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},
 
+  include: ['./types'],
+  ingnore: ['./db-content/*.*'],
+
+  // publicRuntimeConfig (client, rw) ,privateRuntimeConfig (server (2 are merged, r) better than using env:
+  // use like import config from '#config' or this.$config
   serverMiddleware:
-    process.env.NODE_ENV === 'production' ? [] : ['~/api/hello.js'],
+    process.env.NODE_ENV === 'production'
+      ? []
+      : ['~/api/jokes.ts', '~/api/countries.ts'],
 }
