@@ -1,5 +1,6 @@
 declare namespace Express {
   export interface Request {
-    input?: string
+    input?: any
+    resource?: any
   }
 }

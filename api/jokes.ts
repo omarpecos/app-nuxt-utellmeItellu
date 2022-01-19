@@ -8,6 +8,22 @@ const app = express()
 app.use(json())
 
 const middlewares = {
+  loadResource: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { jokeUuid } = req.params
+      const joke = await Joke.findById(jokeUuid)
+      if (joke) {
+        req.resource = joke
+        next()
+      } else throw new Error('404 - Not Found')
+    } catch (error: any) {
+      const status = 404
+      res.status(status).json({
+        status,
+        error: 'Not found',
+      })
+    }
+  },
   validate:
     (op: ValidationTypes) =>
     async (req: Request, res: Response, next: NextFunction) => {
@@ -25,7 +41,6 @@ const middlewares = {
         res.status(status).json({
           status,
           errors: details,
-          error,
         })
       }
     },
@@ -39,7 +54,7 @@ apiRouter.get('/', async (req, res) => {
     {
       $match: { country },
     },
-    { $sort: { lastUpdate: -1 } },
+    { $sort: { updatedAt: -1 } },
     {
       $group: {
         _id: '$lang',
@@ -64,6 +79,13 @@ apiRouter.get('/', async (req, res) => {
   })
 })
 
+apiRouter.get('/:jokeUuid', middlewares.loadResource, (req, res) => {
+  const { resource: joke } = req
+  res.json({
+    data: joke,
+  })
+})
+
 apiRouter.post(
   '/',
   middlewares.validate(ValidationTypes.CREATE),
@@ -71,11 +93,39 @@ apiRouter.post(
     const { input } = req
     const joke = new Joke(input)
     await joke.save()
+    res.status(201).json({
+      data: joke,
+    })
+  }
+)
+
+apiRouter.patch(
+  '/:jokeUuid',
+  middlewares.loadResource,
+  middlewares.validate(ValidationTypes.UPDATE),
+  async (req, res) => {
+    const { resource, input } = req
+    const joke = await Joke.findByIdAndUpdate(
+      resource.id,
+      {
+        ...input,
+        updatedAt: new Date().toISOString(),
+      },
+      { new: true }
+    )
+
     res.json({
       data: joke,
     })
   }
 )
+
+apiRouter.delete('/:jokeUuid', middlewares.loadResource, async (req, res) => {
+  const { resource } = req
+  await resource.remove()
+
+  res.status(204).json({})
+})
 
 // Not found route middleware
 apiRouter.use('/**', (_req, res) => {
