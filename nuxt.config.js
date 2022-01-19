@@ -60,6 +60,7 @@ export default {
   build: {},
 
   include: ['./types'],
+  ingnore: ['./db-content/*.*'],
 
   // publicRuntimeConfig (client, rw) ,privateRuntimeConfig (server (2 are merged, r) better than using env:
   // use like import config from '#config' or this.$config
