@@ -77,8 +77,8 @@ export default {
           to: '/',
         },
         {
-          icon: 'mdi-chart-bubble',
-          title: 'Select country',
+          icon: 'mdi-earth',
+          title: 'Country/Language',
           to: '/country',
         },
       ],

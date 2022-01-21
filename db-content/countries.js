@@ -1,4 +1,3 @@
-// TODO: Must exclude this file from build is more for me
 const fs = require('fs')
 const path = require('path')
 const sortBy = require('lodash/sortBy')
