@@ -142,33 +142,39 @@
 <script lang="ts">
 import { Component, Vue, Getter } from 'nuxt-property-decorator'
 import { fetchCountryCode } from '~/lib/api/backend'
+import { Country } from '~/lib/models/country'
+import { Lang } from '~/lib/models/lang'
 import { getFullCountryObject } from '~/lib/utils/functions'
 
 @Component({
   name: 'CountrySelector',
 })
 export default class CountrySelector extends Vue {
-  @Getter('apiUrl') apiUrl: any
-  @Getter('allCountriesAndLangs') allData: any
-  @Getter('selectedCountry') selectedCountry: any
-  @Getter('selectedLang') selectedLang: any
+  @Getter('apiUrl') apiUrl: string
+  @Getter('allCountriesAndLangs') allData: {
+    countries: Country[]
+    langs: Lang[]
+  }
+
+  @Getter('selectedCountry') selectedCountry: Country
+  @Getter('selectedLang') selectedLang: Lang
 
   loading = false
   textSearch = ''
-  countrySearch = []
+  countrySearch: Country[] = []
 
   searchForCountry(input: string) {
-    const countries = this.allData.countries
+    const { countries } = this.allData
     const regex: RegExp = new RegExp(`(${input.toLowerCase()}+?)`, 'g')
 
-    this.countrySearch = countries.filter(({ name }: { name: string }) => {
+    this.countrySearch = countries.filter(({ name }: Country) => {
       // const match = regex.test(name.toLowerCase())
       const match = name.toLowerCase().match(regex)
       return !!match
     })
   }
 
-  selectCountry(country: any | null) {
+  selectCountry(country: Country | null) {
     if (!country) {
       this.$store.dispatch('setSelectedLang', undefined)
       this.countrySearch = []
@@ -176,17 +182,16 @@ export default class CountrySelector extends Vue {
     this.$store.dispatch('setSelectedCountry', country || undefined)
   }
 
-  selectLang(lang: any | null) {
+  selectLang(lang: Lang | null) {
     this.$store.dispatch('setSelectedLang', lang || undefined)
   }
 
   async getCountryFromIp() {
     this.loading = true
     try {
-      await new Promise<void>((resolve, _reject) => {
-        setTimeout(() => resolve(), 3000)
-      })
-      const { data: country } = await fetchCountryCode(this.apiUrl)
+      const {
+        data: { country },
+      } = await fetchCountryCode(this.apiUrl)
       const countryObject = getFullCountryObject(country, this.allData.langs)
       this.$store.dispatch('setSelectedCountry', countryObject)
       this.loading = false

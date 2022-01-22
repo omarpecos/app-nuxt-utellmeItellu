@@ -2,13 +2,15 @@ import { ActionTree, MutationTree, GetterTree } from 'vuex'
 import { Request } from 'express'
 import { fetchAllCountriesAndLangs, fetchCountryCode } from '~/lib/api/backend'
 import { getFullCountryObject } from '~/lib/utils/functions'
+import { Country } from '~/lib/models/country'
+import { Lang } from '~/lib/models/lang'
 
 export const state = () => ({
   apiUrl: '',
-  countries: undefined as any[] | undefined,
-  langs: undefined as any[] | undefined,
-  selectedCountry: undefined as any | undefined,
-  selectedLang: undefined as any | undefined,
+  countries: undefined as Country[] | undefined,
+  langs: undefined as Lang[] | undefined,
+  selectedCountry: undefined as Country | undefined,
+  selectedLang: undefined as Lang | undefined,
 })
 
 export type RootState = ReturnType<typeof state>
@@ -22,16 +24,12 @@ export const actions: ActionTree<RootState, RootState> = {
     try {
       const apiUrl = `http${host.includes('localhost') ? '' : 's'}://${host}`
       commit('SET_API_URL', apiUrl)
-      const tasks = [
-        fetchAllCountriesAndLangs(state.apiUrl),
-        fetchCountryCode(state.apiUrl),
-      ]
-      const [
-        {
-          data: { countries, langs },
-        },
-        { data: country },
-      ] = await Promise.all(tasks)
+      const {
+        data: { countries, langs },
+      } = await fetchAllCountriesAndLangs(state.apiUrl)
+      const {
+        data: { country },
+      } = await fetchCountryCode(state.apiUrl)
       commit('SET_COUNTRIES', countries)
       commit('SET_LANGS', langs)
       dispatch('setSelectedCountry', country)
@@ -40,7 +38,7 @@ export const actions: ActionTree<RootState, RootState> = {
       console.log(error)
     }
   },
-  setSelectedCountry({ commit, state }, country) {
+  setSelectedCountry({ commit, state }, country: Country) {
     if (country) {
       const countryObject = getFullCountryObject(country, state.langs || [])
       commit('SET_SELECTED_COUNTRY', countryObject)
@@ -48,7 +46,7 @@ export const actions: ActionTree<RootState, RootState> = {
       commit('SET_SELECTED_COUNTRY', country)
     }
   },
-  setSelectedLang({ commit }, lang) {
+  setSelectedLang({ commit }, lang: Lang) {
     commit('SET_SELECTED_LANG', lang)
   },
 }
@@ -57,16 +55,16 @@ export const mutations: MutationTree<RootState> = {
   SET_API_URL: (state, apiUrl) => {
     state.apiUrl = apiUrl
   },
-  SET_COUNTRIES: (state, countries) => {
+  SET_COUNTRIES: (state, countries: Country[]) => {
     state.countries = countries
   },
-  SET_LANGS: (state, langs) => {
+  SET_LANGS: (state, langs: Lang[]) => {
     state.langs = langs
   },
-  SET_SELECTED_COUNTRY: (state, country) => {
+  SET_SELECTED_COUNTRY: (state, country: Country) => {
     state.selectedCountry = country
   },
-  SET_SELECTED_LANG: (state, lang) => {
+  SET_SELECTED_LANG: (state, lang: Lang) => {
     state.selectedLang = lang
   },
 }
@@ -75,10 +73,13 @@ export const getters: GetterTree<RootState, RootState> = {
   apiUrl(state) {
     return state.apiUrl
   },
-  allCountriesAndLangs(state) {
+  allCountriesAndLangs(state): {
+    countries: Country[]
+    langs: Lang[]
+  } {
     return {
-      countries: state.countries,
-      langs: state.langs,
+      countries: state.countries || [],
+      langs: state.langs || [],
     }
   },
   selectedCountry(state) {
@@ -87,7 +88,7 @@ export const getters: GetterTree<RootState, RootState> = {
   selectedLang(state) {
     return state.selectedLang
   },
-  hasConfig(state) {
-    return state.selectedCountry && state.selectedLang
+  hasConfig(state): Boolean {
+    return !!(state.selectedCountry && state.selectedLang)
   },
 }

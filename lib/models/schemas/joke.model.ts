@@ -1,5 +1,7 @@
-import { model, models, Schema } from 'mongoose'
+import { model, models, Schema, Document } from 'mongoose'
+import { Joke as JokeDTO } from '../joke'
 
+type JokeType = JokeDTO & Document
 const jokeSchema = new Schema({
   title: String,
   text: String,
@@ -9,6 +11,6 @@ const jokeSchema = new Schema({
   updatedAt: { type: Date, default: Date.now },
 })
 
-const Joke = models.Joke || model('Joke', jokeSchema)
+const Joke = models.Joke || model<JokeType>('Joke', jokeSchema)
 
 export default Joke
