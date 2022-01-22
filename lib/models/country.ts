@@ -8,16 +8,3 @@ export class Country {
   @Expose() langs: String[]
   @Expose() languages?: Lang[]
 }
-
-export interface ApiResponseCountries {
-  data: {
-    countries: Country[]
-    langs: Lang[]
-  }
-}
-
-export interface ApiResponseCountryCode {
-  data: {
-    country: Country
-  }
-}

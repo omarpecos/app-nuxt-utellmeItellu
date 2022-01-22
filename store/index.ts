@@ -1,6 +1,10 @@
 import { ActionTree, MutationTree, GetterTree } from 'vuex'
 import { Request } from 'express'
-import { fetchAllCountriesAndLangs, fetchCountryCode } from '~/lib/api/backend'
+import {
+  fetchAllCountriesAndLangs,
+  fetchCountryCode,
+  ResponseCountries,
+} from '~/lib/api/backend'
 import { getFullCountryObject } from '~/lib/utils/functions'
 import { Country } from '~/lib/models/country'
 import { Lang } from '~/lib/models/lang'
@@ -73,10 +77,7 @@ export const getters: GetterTree<RootState, RootState> = {
   apiUrl(state) {
     return state.apiUrl
   },
-  allCountriesAndLangs(state): {
-    countries: Country[]
-    langs: Lang[]
-  } {
+  allCountriesAndLangs(state): ResponseCountries {
     return {
       countries: state.countries || [],
       langs: state.langs || [],

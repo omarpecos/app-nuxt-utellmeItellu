@@ -141,7 +141,7 @@
 
 <script lang="ts">
 import { Component, Vue, Getter } from 'nuxt-property-decorator'
-import { fetchCountryCode } from '~/lib/api/backend'
+import { fetchCountryCode, ResponseCountries } from '~/lib/api/backend'
 import { Country } from '~/lib/models/country'
 import { Lang } from '~/lib/models/lang'
 import { getFullCountryObject } from '~/lib/utils/functions'
@@ -151,10 +151,7 @@ import { getFullCountryObject } from '~/lib/utils/functions'
 })
 export default class CountrySelector extends Vue {
   @Getter('apiUrl') apiUrl: string
-  @Getter('allCountriesAndLangs') allData: {
-    countries: Country[]
-    langs: Lang[]
-  }
+  @Getter('allCountriesAndLangs') allData: ResponseCountries
 
   @Getter('selectedCountry') selectedCountry: Country
   @Getter('selectedLang') selectedLang: Lang
