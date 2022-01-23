@@ -1,5 +1,5 @@
 <template>
-  <NuxtLink class="app-country-toolbar" v-if="hasConfig" to="/country">
+  <NuxtLink v-if="hasConfig" class="app-country-toolbar" to="/country">
     <v-row justify="center" align="center">
       <v-icon class="mr-2"> mdi-earth </v-icon>
       <v-img
