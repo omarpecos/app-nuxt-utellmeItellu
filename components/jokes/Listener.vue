@@ -1,5 +1,16 @@
 <template>
   <div class="app-listener">
+    <!-- Alert -->
+    <v-alert
+      v-if="extraInfo.message"
+      dismissible
+      border="top"
+      colored-border
+      :type="extraInfo.error ? 'error' : 'info'"
+      elevation="2"
+    >
+      {{ extraInfo.message }}
+    </v-alert>
     <div class="app-listener-container">
       <p
         v-for="(p, index) in text"
@@ -49,7 +60,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Getter, Vue } from 'nuxt-property-decorator'
+import { Component, Getter, Vue, Watch } from 'nuxt-property-decorator'
 import SpeechToText from 'speech-to-text'
 import { fetchCreateJoke } from '~/lib/api/backend'
 import { Joke } from '~/lib/models/joke'
@@ -67,6 +78,10 @@ export default class ListenerComponent extends Vue {
   draggingIndex: number | undefined
   input = ''
   presave = false
+  extraInfo = {
+    error: false,
+    message: '',
+  }
 
   /* Handlers */
   drag(ev: DragEvent, index: number) {
@@ -98,8 +113,7 @@ export default class ListenerComponent extends Vue {
   }
 
   onEndEvent() {
-    // WIP - better alert to user
-    alert('End recording')
+    this.extraInfo.message = 'End of line recorded'
     // eslint-disable-next-line no-console
     console.log('onEndEvent')
   }
@@ -128,7 +142,8 @@ export default class ListenerComponent extends Vue {
           lang: code,
         }
         const { data: jokeCreated } = await fetchCreateJoke(this.apiUrl, joke)
-        alert('Joke with title ' + jokeCreated.title + 'has been created')
+        this.extraInfo.message =
+          'Joke with title "' + jokeCreated.title + '" has been created'
         this.clean()
       } catch (error) {
         // eslint-disable-next-line no-console
@@ -144,6 +159,22 @@ export default class ListenerComponent extends Vue {
     this.textRecognised = ''
     this.presave = false
     this.input = ''
+  }
+
+  /* Watchers */
+  @Watch('extraInfo.message')
+  async onChangeExtraInfoMessage(currValue: string, _prevValue: string) {
+    if (currValue) {
+      await new Promise<void>((resolve) =>
+        setTimeout(() => {
+          this.extraInfo = {
+            error: false,
+            message: '',
+          }
+          resolve()
+        }, 3000)
+      )
+    }
   }
 
   /* Lifecycles */
@@ -164,10 +195,12 @@ export default class ListenerComponent extends Vue {
         this.onAnythingSaid,
         this.selectedLang.code
       )
-    } catch (error) {
-      // TODO - Handle better this error!!
-      // eslint-disable-next-line no-console
-      console.error('EEEYYY', error)
+    } catch (error: any) {
+      this.extraInfo = {
+        error: true,
+        message: error.message || 'Unexpected error',
+      }
+      console.error('error inside mounted in Listener.vue', error)
     }
   }
 }
