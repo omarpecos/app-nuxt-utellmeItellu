@@ -200,6 +200,7 @@ export default class ListenerComponent extends Vue {
         error: true,
         message: error.message || 'Unexpected error',
       }
+      // eslint-disable-next-line no-console
       console.error('error inside mounted in Listener.vue', error)
     }
   }
