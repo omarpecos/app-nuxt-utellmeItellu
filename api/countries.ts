@@ -1,8 +1,7 @@
 // lib import
 import express, { Router, json } from 'express'
-// models import
-import Country from '../lib/models/country.model'
-import Lang from '../lib/models/lang.model'
+// Mongoose models
+import { Country, Lang } from '../lib/models/schemas'
 const requestCountry = require('request-country')
 
 const app = express()
@@ -15,7 +14,9 @@ apiRouter.get('/code', async (req, res) => {
   const countryCode = requestCountry(req, 'ES') // or requestCountry('2.2.2.2')
   const country = await Country.findOne({ code: countryCode })
   res.json({
-    data: country,
+    data: {
+      country,
+    },
   })
 })
 
