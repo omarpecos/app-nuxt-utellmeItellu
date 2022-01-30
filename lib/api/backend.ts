@@ -1,6 +1,7 @@
 import { Country } from '../models/country'
 import { Joke } from '../models/joke'
 import { Lang } from '../models/lang'
+import { HTTPMethods, makeRequest } from './clients/back'
 
 const endpoints = {
   countries: '/countries',
@@ -34,15 +35,17 @@ export interface ResponseCountryCode {
 export const fetchAllCountriesAndLangs = async (
   apiUrl: string
 ): Promise<ApiResponse<ResponseCountries>> => {
-  const promise = await fetch(`${apiUrl}/api${endpoints.countries}`)
-  return await promise.json()
+  return await makeRequest({
+    url: `${apiUrl}/api${endpoints.countries}`,
+  })
 }
 
 export const fetchCountryCode = async (
   apiUrl: string
 ): Promise<ApiResponse<ResponseCountryCode>> => {
-  const promise = await fetch(`${apiUrl}/api${endpoints.countryCode}`)
-  return await promise.json()
+  return await makeRequest({
+    url: `${apiUrl}/api${endpoints.countryCode}`,
+  })
 }
 
 /* Countries/Languages methods */
@@ -50,12 +53,9 @@ export const fetchCreateJoke = async (
   apiUrl: string,
   joke: Joke
 ): Promise<ApiResponse<Joke>> => {
-  const promise = await fetch(`${apiUrl}/api${endpoints.createJoke}`, {
-    method: 'POST',
+  return await makeRequest({
+    url: `${apiUrl}/api${endpoints.createJoke}`,
+    method: HTTPMethods.POST,
     body: JSON.stringify(joke),
-    headers: {
-      'Content-Type': 'application/json',
-    },
   })
-  return await promise.json()
 }
