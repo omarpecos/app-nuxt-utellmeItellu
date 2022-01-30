@@ -60,7 +60,7 @@ apiRouter.get('/', async (req, res) => {
       $group: {
         _id: '$lang',
         jokes: {
-          $addToSet: {
+          $push: {
             _id: '$_id',
             country: '$country',
             lang: '$lang',
