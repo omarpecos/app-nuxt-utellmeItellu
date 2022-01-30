@@ -1,5 +1,6 @@
 import { ActionTree, MutationTree, GetterTree } from 'vuex'
 import { Request } from 'express'
+import { NuxtRuntimeConfig } from '@nuxt/types/config/runtime'
 import {
   fetchAllCountriesAndLangs,
   fetchCountryCode,
@@ -10,6 +11,7 @@ import { Country } from '~/lib/models/country'
 import { Lang } from '~/lib/models/lang'
 
 export const state = () => ({
+  devMode: false,
   apiUrl: '',
   countries: undefined as Country[] | undefined,
   langs: undefined as Lang[] | undefined,
@@ -20,7 +22,11 @@ export const state = () => ({
 export type RootState = ReturnType<typeof state>
 
 export const actions: ActionTree<RootState, RootState> = {
-  async nuxtServerInit({ dispatch }, { req }: { req: Request }) {
+  async nuxtServerInit(
+    { dispatch, commit },
+    { req, $config }: { req: Request; $config: NuxtRuntimeConfig }
+  ) {
+    commit('SET_DEV_MODE', $config.devMode)
     const host = req.headers.host
     await dispatch('initializeStore', host)
   },
@@ -34,6 +40,18 @@ export const actions: ActionTree<RootState, RootState> = {
       const {
         data: { country },
       } = await fetchCountryCode(state.apiUrl)
+      // only for development speed up
+      if (state.devMode) {
+        // eslint-disable-next-line no-console
+        console.log(
+          '%cThe app is in DEV mode',
+          'color: purple; font-size:20px; font-weight: bold: padding:5px;'
+        )
+        const defaultLang = langs.find(
+          ({ countryCode }) => country.code === countryCode
+        )
+        dispatch('setSelectedLang', defaultLang)
+      }
       commit('SET_COUNTRIES', countries)
       commit('SET_LANGS', langs)
       dispatch('setSelectedCountry', country)
@@ -56,6 +74,9 @@ export const actions: ActionTree<RootState, RootState> = {
 }
 
 export const mutations: MutationTree<RootState> = {
+  SET_DEV_MODE: (state, mode) => {
+    state.devMode = mode
+  },
   SET_API_URL: (state, apiUrl) => {
     state.apiUrl = apiUrl
   },

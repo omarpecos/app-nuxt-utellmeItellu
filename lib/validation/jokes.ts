@@ -18,14 +18,14 @@ const getValidationSchema = (op = ValidationTypes.CREATE) => {
 
 const createJoke = joi.object({
   title: joi.string().required(),
-  text: joi.string().required(),
+  text: joi.array().items(joi.string()).required(),
   country: joi.string().required(),
   lang: joi.string().required(),
 })
 
 const updateJoke = joi.object({
   title: joi.string(),
-  text: joi.string(),
+  text: joi.array().items(joi.string()),
   country: joi.string(),
   lang: joi.string(),
 })
