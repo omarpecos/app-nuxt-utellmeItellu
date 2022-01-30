@@ -1,8 +1,9 @@
 // lib import
 import express, { Router, json, Request, Response, NextFunction } from 'express'
-// Mongoose models
-import Joke from '../lib/models/joke.model'
+
 import { ValidationTypes, checkInput } from '../lib/validation/jokes'
+// Mongoose models
+import { Joke } from '../lib/models/schemas'
 
 const app = express()
 app.use(json())
@@ -59,7 +60,7 @@ apiRouter.get('/', async (req, res) => {
       $group: {
         _id: '$lang',
         jokes: {
-          $addToSet: {
+          $push: {
             _id: '$_id',
             country: '$country',
             lang: '$lang',
