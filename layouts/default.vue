@@ -63,6 +63,11 @@ export default {
           title: 'Country/Language',
           to: '/country',
         },
+        {
+          icon: 'mdi-plus-box',
+          title: 'Create',
+          to: '/joke/create',
+        },
       ],
       miniVariant: false,
       right: true,
